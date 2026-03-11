@@ -2,147 +2,170 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RMS Hunks Dartboard - Bullseye Style</title>
+<title>RMS Hunks Dartboard Arcade</title>
 <style>
-body{
+body {
   font-family: Arial;
-  background: #0b1c2c;
-  color: white;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  cursor: none; /* hide default cursor */
+  background:#060612;
+  color:white;
+  text-align:center;
+  margin:0;
 }
-h1{margin-top:10px;}
-#board{
+h1 {
+  color:#00eaff;
+  text-shadow:0 0 12px #00eaff, 0 0 20px #ff00ff;
+}
+#board {
   position: relative;
-  width: 520px;
-  height: 520px;
-  margin: 20px auto;
-  border-radius: 50%;
-  border: 10px solid #222;
-  background: conic-gradient(
-    #b71c1c 0deg 16deg,#222 16deg 32deg,#b71c1c 32deg 48deg,#222 48deg 64deg,
-    #b71c1c 64deg 80deg,#222 80deg 96deg,#b71c1c 96deg 112deg,#222 112deg 128deg,
-    #b71c1c 128deg 144deg,#222 144deg 160deg,#b71c1c 160deg 176deg,#222 176deg 192deg,
-    #b71c1c 192deg 208deg,#222 208deg 224deg,#b71c1c 224deg 240deg,#222 240deg 256deg,
-    #b71c1c 256deg 272deg,#222 272deg 288deg,#b71c1c 288deg 304deg,#222 304deg 320deg,
-    #b71c1c 320deg 336deg,#222 336deg 360deg
+  width:520px;
+  height:520px;
+  margin:30px auto;
+  border-radius:50%;
+  border:6px solid #00eaff;
+  box-shadow:
+    0 0 25px #00eaff,
+    inset 0 0 40px #ff00ff;
+  background:conic-gradient(
+    #ff0066 0deg 16deg,
+    #111 16deg 32deg,
+    #ff0066 32deg 48deg,
+    #111 48deg 64deg,
+    #ff0066 64deg 80deg,
+    #111 80deg 96deg,
+    #ff0066 96deg 112deg,
+    #111 112deg 128deg,
+    #ff0066 128deg 144deg,
+    #111 144deg 160deg,
+    #ff0066 160deg 176deg,
+    #111 176deg 192deg,
+    #ff0066 192deg 208deg,
+    #111 208deg 224deg,
+    #ff0066 224deg 240deg,
+    #111 240deg 256deg,
+    #ff0066 256deg 272deg,
+    #111 272deg 288deg,
+    #ff0066 288deg 304deg,
+    #111 304deg 320deg,
+    #ff0066 320deg 336deg,
+    #111 336deg 360deg
   );
+  transition: transform 1s ease-out;
 }
-.segment{
+.segment {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-origin: 0 0;
-  font-size: 12px;
-  text-align: center;
-  padding: 2px 4px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 4px;
-  white-space: nowrap;
-  color: #fff;
+  left:50%;
+  top:50%;
+  transform-origin:0 0;
+  font-size:12px;
+  padding:3px 6px;
+  background:rgba(0,0,0,0.6);
+  border-radius:6px;
+  white-space:nowrap;
+  color:#00eaff;
+  text-shadow:0 0 6px #00eaff;
+  transition: all 0.3s;
 }
-#bull{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 90px;
-  height: 90px;
-  background: gold;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: black;
-  text-align: center;
+.segment.highlight {
+  color:#ff00ff;
+  text-shadow:0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  transform: scale(1.3) rotate(var(--angle));
 }
-.dart{
-  position: absolute;
-  width: 6px;
-  height: 40px;
-  background: #ddd;
-  border-radius: 2px;
-  transform-origin: bottom center;
+#bull {
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#00eaff;
+  color:black;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  box-shadow:0 0 20px #00eaff, 0 0 40px #ff00ff;
 }
-.dart::before{
+.dart {
+  position:absolute;
+  width:6px;
+  height:40px;
+  background:white;
+  border-radius:2px;
+  transform-origin:bottom center;
+}
+.dart::before {
   content:"";
   position:absolute;
   bottom:0;
   left:50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 12px solid red;
+  transform:translateX(-50%);
+  border-left:5px solid transparent;
+  border-right:5px solid transparent;
+  border-bottom:12px solid #ff0066;
 }
-.dart::after{
+.dart::after {
   content:"";
   position:absolute;
   top:0;
   left:50%;
-  transform: translateX(-50%);
-  width: 10px;
-  height: 10px;
-  background: #333;
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform:translateX(-50%);
+  width:10px;
+  height:10px;
+  background:#00eaff;
+  clip-path:polygon(50% 0%,0% 100%,100% 100%);
 }
-#results{
-  margin-top: 20px;
-  font-size: 22px;
+button {
+  padding:14px 28px;
+  font-size:18px;
+  background:#00eaff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  color:black;
+  font-weight:bold;
+  box-shadow:0 0 10px #00eaff;
+  margin-top:10px;
 }
-button{
-  margin-top: 15px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
+button:hover {
+  transform:scale(1.05);
 }
-
-/* Laser-sight cursor */
-#gameCursor {
-  position: fixed;
-  width: 30px;
-  height: 30px;
-  border: 2px solid #ff0000;
-  border-radius: 50%;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
+#results {
+  margin-top:20px;
+  font-size:22px;
+  color:#00eaff;
+  text-shadow:0 0 10px #00eaff;
 }
-#gameCursor::before,
-#gameCursor::after{
-  content: "";
-  position: absolute;
-  background: #ff0000;
+.confetti {
+  position:absolute;
+  width:6px;
+  height:6px;
+  background: #ff0;
+  animation: fall 1s linear forwards;
 }
-#gameCursor::before{
-  width: 2px; height: 30px; left: 50%; top: 0; transform: translateX(-50%);
-}
-#gameCursor::after{
-  width: 30px; height: 2px; left:0; top:50%; transform: translateY(-50%);
+@keyframes fall {
+  0% {transform: translateY(0px);}
+  100% {transform: translateY(400px);}
 }
 </style>
 </head>
 <body>
 
-<h1>🎯 RMS Hunks Dartboard</h1>
-<p>Click the board to throw your darts</p>
+<h1>🎯 RMS Hunks Dartboard Arcade</h1>
+<p>Throw 3 darts to decide your fate</p>
 
 <div id="board">
   <div id="bull">Simon<br>Moat</div>
 </div>
 
-<div id="results"></div>
+<button onclick="throwDart()">Throw Dart</button>
 <button onclick="resetGame()">New Game</button>
 
-<div id="gameCursor"></div>
+<div id="results"></div>
 
 <script>
-// RMS Hunks names
-const names = [
+const names=[
 "Matty Wright","David Jones","Jack Cochrane","Peter Clark","James Reay",
 "Brian Johnson","Kevin Stobbart","Matthew Scott","Bruce Walker","Tony Jiminez",
 "Michael Storey","Jack Raine","Alistair Bowman","Ash Bughio","Jamie Duprey",
@@ -153,105 +176,91 @@ const names = [
 let shuffled=[];
 let darts=[];
 let throws=0;
+const board=document.getElementById("board");
 
-// Laser-sight cursor with heavy wobble
-const cursor = document.getElementById("gameCursor");
-document.addEventListener("mousemove", (e) => {
-  const wobble = 35; // heavy wobble for chaos
-  const offsetX = (Math.random()-0.5)*wobble;
-  const offsetY = (Math.random()-0.5)*wobble;
-  cursor.style.left = (e.clientX + offsetX) + "px";
-  cursor.style.top = (e.clientY + offsetY) + "px";
-});
-
-function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
 
 function setupBoard(){
   shuffled=shuffle([...names]);
-  const board=document.getElementById("board");
   document.querySelectorAll(".segment").forEach(e=>e.remove());
-  let angleStep=360/shuffled.length;
+  let step=360/shuffled.length;
   shuffled.forEach((name,i)=>{
-    let angle=i*angleStep;
+    let angle=i*step;
     let label=document.createElement("div");
     label.className="segment";
     label.innerText=name;
-    let radius = 200;
-    let rad = angle*Math.PI/180;
-    let x = 260 + radius*Math.cos(rad)-30;
-    let y = 260 + radius*Math.sin(rad)-10;
-    label.style.left = x+"px";
-    label.style.top = y+"px";
-    label.style.transform = "rotate("+angle+"deg)";
+    label.style.setProperty("--angle", angle+"deg");
+    let radius=210;
+    let rad=angle*Math.PI/180;
+    let x=260+radius*Math.cos(rad)-30;
+    let y=260+radius*Math.sin(rad)-10;
+    label.style.left=x+"px";
+    label.style.top=y+"px";
+    label.style.transform="rotate("+angle+"deg)";
     board.appendChild(label);
   });
 }
 
-// Dart throw logic
-function throwDart(event){
-  if(throws>=3) return;
-  const board=document.getElementById("board");
-  const rect=board.getBoundingClientRect();
-  let mouseX = event.clientX - rect.left;
-  let mouseY = event.clientY - rect.top;
-
-  // Target wobble
-  let cursorWobble = 120;
-  let wobbleX = mouseX + (Math.random()*cursorWobble - cursorWobble/2);
-  let wobbleY = mouseY + (Math.random()*cursorWobble - cursorWobble/2);
-  wobbleX = Math.max(0, Math.min(rect.width, wobbleX));
-  wobbleY = Math.max(0, Math.min(rect.height, wobbleY));
-
-  let dart=document.createElement("div");
-  dart.className="dart";
-  board.appendChild(dart);
-
-  let startX=rect.width/2;
-  let startY=rect.height/2;
-  let finalX=wobbleX;
-  let finalY=wobbleY;
-  let duration=400;
-  let startTime=null;
-
-  function animate(time){
-    if(!startTime) startTime=time;
-    let t=(time-startTime)/duration;
-    if(t>1) t=1;
-
-    let x=startX + (finalX-startX)*t;
-    let y=startY + (finalY-startY)*t;
-
-    // flight wobble
-    let flightWobble = 15;
-    let angle = Math.atan2(finalY-startY, finalX-startX)+Math.PI/2;
-    x += Math.sin(t * Math.PI * 4)*flightWobble*Math.sin(angle);
-    y += Math.sin(t * Math.PI * 4)*flightWobble*Math.cos(angle);
-
-    dart.style.left = x + "px";
-    dart.style.top = y + "px";
-    dart.style.transform = "rotate("+(Math.atan2(finalY-startY, finalX-startX)*180/Math.PI)+"deg)";
-
-    if(t<1){
-      requestAnimationFrame(animate);
-    } else {
-      let dx=finalX - rect.width/2;
-      let dy=finalY - rect.height/2;
-      let distance=Math.sqrt(dx*dx+dy*dy);
-      let result;
-      if(distance < 45){
-        result="Simon Moat";
-      } else {
-        let angle=Math.atan2(dy,dx)*(180/Math.PI);
-        angle=(angle+360+90)%360;
-        let segment=Math.floor(angle/(360/shuffled.length));
-        result=shuffled[segment];
-      }
-      darts.push(result);
-      throws++;
-      if(throws===3) showResults();
-    }
+// Bullseye confetti effect
+function confettiBurst(){
+  for(let i=0;i<30;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*520+"px";
+    c.style.background=["#ff0","#ff0ff","#0ff","#0f0","#f00"][Math.floor(Math.random()*5)];
+    board.appendChild(c);
+    setTimeout(()=>c.remove(),1000);
   }
-  requestAnimationFrame(animate);
+}
+
+// Throw dart with spinning + random landing
+function throwDart(){
+  if(throws>=3) return;
+  // Spin animation
+  let rotation=Math.random()*720+360;
+  board.style.transition="transform 1s ease-out";
+  board.style.transform=`rotate(${rotation}deg)`;
+
+  // Highlight segment
+  let highlightIndex=Math.floor(Math.random()*shuffled.length);
+  document.querySelectorAll(".segment").forEach((el,i)=>{
+    el.classList.remove("highlight");
+    if(i===highlightIndex) el.classList.add("highlight");
+  });
+
+  setTimeout(()=>{
+    // Dart lands
+    let name=shuffled[highlightIndex];
+    if(Math.random()<0.05) name="Simon Moat";
+
+    // Add dart flying in
+    let dart=document.createElement("div");
+    dart.className="dart";
+    board.appendChild(dart);
+    let startX=-50;
+    let startY=Math.random()*520;
+    let rect=board.getBoundingClientRect();
+    let step=0;
+    let duration=600;
+    let targetX=rect.width/2 + Math.cos(highlightIndex*2*Math.PI/shuffled.length)*180;
+    let targetY=rect.height/2 + Math.sin(highlightIndex*2*Math.PI/shuffled.length)*180;
+    function animate(time){
+      step+=16/duration;
+      if(step>1) step=1;
+      dart.style.left=startX+(targetX-startX)*step+"px";
+      dart.style.top=startY+(targetY-startY)*step+"px";
+      dart.style.transform=`rotate(${Math.atan2(targetY-startY,targetX-startX)*180/Math.PI}deg)`;
+      if(step<1) requestAnimationFrame(animate);
+      else {
+        darts.push(name);
+        throws++;
+        if(name==="Simon Moat") confettiBurst();
+        if(throws===3) showResults();
+      }
+    }
+    requestAnimationFrame(animate);
+
+  },1000);
 }
 
 function showResults(){
@@ -263,13 +272,14 @@ function showResults(){
 
 function resetGame(){
   document.querySelectorAll(".dart").forEach(e=>e.remove());
+  document.querySelectorAll(".segment").forEach(e=>e.classList.remove("highlight"));
   throws=0;
   darts=[];
   document.getElementById("results").innerHTML="";
+  board.style.transform="rotate(0deg)";
   setupBoard();
 }
 
-document.getElementById("board").addEventListener("click",throwDart);
 setupBoard();
 </script>
 
