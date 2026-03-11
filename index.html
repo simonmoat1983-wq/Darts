@@ -38,6 +38,12 @@ h1{
   top: 50%;
   transform-origin: 0 0;
   font-size: 12px;
+  text-align: center;
+  padding: 2px 4px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+  white-space: nowrap;
+  color: #fff;
 }
 #bull{
   position: absolute;
@@ -73,7 +79,7 @@ h1{
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 10px solid red;
+  border-bottom: 12px solid red;
 }
 .dart::after{
   content:"";
@@ -81,10 +87,10 @@ h1{
   top:0;
   left:50%;
   transform: translateX(-50%);
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background: #333;
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 #results{
   margin-top: 20px;
@@ -136,27 +142,33 @@ function setupBoard(){
     let label=document.createElement("div");
     label.className="segment";
     label.innerText=name;
-    label.style.transform="rotate("+angle+"deg) translate(210px) rotate(-"+angle+"deg)";
+    // Move out along radius and rotate with segment
+    let radius = 200;
+    let rad = angle * Math.PI / 180;
+    let x = 260 + radius * Math.cos(rad) - 30; // center + offset - half width
+    let y = 260 + radius * Math.sin(rad) - 10; // center + offset - half height
+    label.style.left = x + "px";
+    label.style.top = y + "px";
+    label.style.transform = "rotate(" + angle + "deg)";
     board.appendChild(label);
   });
 }
 
-// Throw with wobble animation
+// Throw with cursor wobble + flight wobble
 function throwDart(event){
   if(throws>=3) return;
   const board=document.getElementById("board");
   const rect=board.getBoundingClientRect();
 
-  let clickX=event.clientX-rect.left;
-  let clickY=event.clientY-rect.top;
+  let mouseX = event.clientX - rect.left;
+  let mouseY = event.clientY - rect.top;
 
-  // Severe chaos
-  let chaos=220;
-  let finalX=clickX+(Math.random()*chaos-chaos/2);
-  let finalY=clickY+(Math.random()*chaos-chaos/2);
-
-  finalX=Math.max(0, Math.min(rect.width, finalX));
-  finalY=Math.max(0, Math.min(rect.height, finalY));
+  // cursor wobble
+  let cursorWobble = 120;
+  let wobbleX = mouseX + (Math.random()*cursorWobble - cursorWobble/2);
+  let wobbleY = mouseY + (Math.random()*cursorWobble - cursorWobble/2);
+  wobbleX = Math.max(0, Math.min(rect.width, wobbleX));
+  wobbleY = Math.max(0, Math.min(rect.height, wobbleY));
 
   let dart=document.createElement("div");
   dart.className="dart";
@@ -164,6 +176,8 @@ function throwDart(event){
 
   let startX=rect.width/2;
   let startY=rect.height/2;
+  let finalX=wobbleX;
+  let finalY=wobbleY;
   let duration=400;
   let startTime=null;
 
@@ -173,28 +187,28 @@ function throwDart(event){
     if(t>1) t=1;
 
     // linear move
-    let x=startX+(finalX-startX)*t;
-    let y=startY+(finalY-startY)*t;
+    let x=startX + (finalX-startX)*t;
+    let y=startY + (finalY-startY)*t;
 
-    // wobble perpendicular
-    let wobble=15;
-    let angle=Math.atan2(finalY-startY, finalX-startX)+Math.PI/2;
-    x+=Math.sin(t*Math.PI*4)*wobble*Math.sin(angle);
-    y+=Math.sin(t*Math.PI*4)*wobble*Math.cos(angle);
+    // flight wobble
+    let flightWobble = 15;
+    let angle = Math.atan2(finalY-startY, finalX-startX)+Math.PI/2;
+    x += Math.sin(t * Math.PI * 4)*flightWobble*Math.sin(angle);
+    y += Math.sin(t * Math.PI * 4)*flightWobble*Math.cos(angle);
 
-    dart.style.left=x+"px";
-    dart.style.top=y+"px";
-    dart.style.transform="rotate("+(Math.atan2(finalY-startY, finalX-startX)*180/Math.PI)+"deg)";
+    dart.style.left = x + "px";
+    dart.style.top = y + "px";
+    dart.style.transform = "rotate("+(Math.atan2(finalY-startY, finalX-startX)*180/Math.PI)+"deg)";
 
     if(t<1){
       requestAnimationFrame(animate);
     } else {
-      // detect result
-      let dx=finalX-rect.width/2;
-      let dy=finalY-rect.height/2;
+      // determine result
+      let dx=finalX - rect.width/2;
+      let dy=finalY - rect.height/2;
       let distance=Math.sqrt(dx*dx+dy*dy);
       let result;
-      if(distance<45){
+      if(distance < 45){
         result="Simon Moat";
       } else {
         let angle=Math.atan2(dy,dx)*(180/Math.PI);
@@ -207,6 +221,7 @@ function throwDart(event){
       if(throws===3) showResults();
     }
   }
+
   requestAnimationFrame(animate);
 }
 
@@ -228,6 +243,5 @@ function resetGame(){
 document.getElementById("board").addEventListener("click",throwDart);
 setupBoard();
 </script>
-
 </body>
 </html>
