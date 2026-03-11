@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RMS Hunks Dartboard</title>
+<title>RMS Hunks Dartboard - Bullseye Style</title>
 <style>
 body{
   font-family: Arial;
@@ -100,15 +100,29 @@ button{
   font-size: 16px;
   cursor: pointer;
 }
-/* Custom Dart Cursor */
+
+/* Laser-sight cursor */
 #gameCursor {
   position: fixed;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #ff0000;
+  border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%);
-  background: url('https://i.imgur.com/7x6dCh1.png') no-repeat center/contain;
   z-index: 1000;
+}
+#gameCursor::before,
+#gameCursor::after{
+  content: "";
+  position: absolute;
+  background: #ff0000;
+}
+#gameCursor::before{
+  width: 2px; height: 30px; left: 50%; top: 0; transform: translateX(-50%);
+}
+#gameCursor::after{
+  width: 30px; height: 2px; left:0; top:50%; transform: translateY(-50%);
 }
 </style>
 </head>
@@ -140,14 +154,14 @@ let shuffled=[];
 let darts=[];
 let throws=0;
 
-// Custom dart cursor
+// Laser-sight cursor with heavy wobble
 const cursor = document.getElementById("gameCursor");
 document.addEventListener("mousemove", (e) => {
-  const wobble = 15;
-  const wobbleX = (Math.random()-0.5)*wobble;
-  const wobbleY = (Math.random()-0.5)*wobble;
-  cursor.style.left = (e.clientX + wobbleX) + "px";
-  cursor.style.top = (e.clientY + wobbleY) + "px";
+  const wobble = 35; // heavy wobble for chaos
+  const offsetX = (Math.random()-0.5)*wobble;
+  const offsetY = (Math.random()-0.5)*wobble;
+  cursor.style.left = (e.clientX + offsetX) + "px";
+  cursor.style.top = (e.clientY + offsetY) + "px";
 });
 
 function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
@@ -173,7 +187,7 @@ function setupBoard(){
   });
 }
 
-// Throw logic with flight wobble
+// Dart throw logic
 function throwDart(event){
   if(throws>=3) return;
   const board=document.getElementById("board");
@@ -181,7 +195,7 @@ function throwDart(event){
   let mouseX = event.clientX - rect.left;
   let mouseY = event.clientY - rect.top;
 
-  // cursor wobble target
+  // Target wobble
   let cursorWobble = 120;
   let wobbleX = mouseX + (Math.random()*cursorWobble - cursorWobble/2);
   let wobbleY = mouseY + (Math.random()*cursorWobble - cursorWobble/2);
