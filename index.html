@@ -11,10 +11,9 @@ body{
   text-align: center;
   margin: 0;
   padding: 0;
+  cursor: none; /* hide default cursor */
 }
-h1{
-  margin-top: 10px;
-}
+h1{margin-top:10px;}
 #board{
   position: relative;
   width: 520px;
@@ -22,7 +21,6 @@ h1{
   margin: 20px auto;
   border-radius: 50%;
   border: 10px solid #222;
-  cursor: crosshair;
   background: conic-gradient(
     #b71c1c 0deg 16deg,#222 16deg 32deg,#b71c1c 32deg 48deg,#222 48deg 64deg,
     #b71c1c 64deg 80deg,#222 80deg 96deg,#b71c1c 96deg 112deg,#222 112deg 128deg,
@@ -102,6 +100,16 @@ button{
   font-size: 16px;
   cursor: pointer;
 }
+/* Custom Dart Cursor */
+#gameCursor {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: url('https://i.imgur.com/7x6dCh1.png') no-repeat center/contain;
+  z-index: 1000;
+}
 </style>
 </head>
 <body>
@@ -115,6 +123,8 @@ button{
 
 <div id="results"></div>
 <button onclick="resetGame()">New Game</button>
+
+<div id="gameCursor"></div>
 
 <script>
 // RMS Hunks names
@@ -130,6 +140,16 @@ let shuffled=[];
 let darts=[];
 let throws=0;
 
+// Custom dart cursor
+const cursor = document.getElementById("gameCursor");
+document.addEventListener("mousemove", (e) => {
+  const wobble = 15;
+  const wobbleX = (Math.random()-0.5)*wobble;
+  const wobbleY = (Math.random()-0.5)*wobble;
+  cursor.style.left = (e.clientX + wobbleX) + "px";
+  cursor.style.top = (e.clientY + wobbleY) + "px";
+});
+
 function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
 function setupBoard(){
@@ -142,28 +162,26 @@ function setupBoard(){
     let label=document.createElement("div");
     label.className="segment";
     label.innerText=name;
-    // Move out along radius and rotate with segment
     let radius = 200;
-    let rad = angle * Math.PI / 180;
-    let x = 260 + radius * Math.cos(rad) - 30; // center + offset - half width
-    let y = 260 + radius * Math.sin(rad) - 10; // center + offset - half height
-    label.style.left = x + "px";
-    label.style.top = y + "px";
-    label.style.transform = "rotate(" + angle + "deg)";
+    let rad = angle*Math.PI/180;
+    let x = 260 + radius*Math.cos(rad)-30;
+    let y = 260 + radius*Math.sin(rad)-10;
+    label.style.left = x+"px";
+    label.style.top = y+"px";
+    label.style.transform = "rotate("+angle+"deg)";
     board.appendChild(label);
   });
 }
 
-// Throw with cursor wobble + flight wobble
+// Throw logic with flight wobble
 function throwDart(event){
   if(throws>=3) return;
   const board=document.getElementById("board");
   const rect=board.getBoundingClientRect();
-
   let mouseX = event.clientX - rect.left;
   let mouseY = event.clientY - rect.top;
 
-  // cursor wobble
+  // cursor wobble target
   let cursorWobble = 120;
   let wobbleX = mouseX + (Math.random()*cursorWobble - cursorWobble/2);
   let wobbleY = mouseY + (Math.random()*cursorWobble - cursorWobble/2);
@@ -186,7 +204,6 @@ function throwDart(event){
     let t=(time-startTime)/duration;
     if(t>1) t=1;
 
-    // linear move
     let x=startX + (finalX-startX)*t;
     let y=startY + (finalY-startY)*t;
 
@@ -203,7 +220,6 @@ function throwDart(event){
     if(t<1){
       requestAnimationFrame(animate);
     } else {
-      // determine result
       let dx=finalX - rect.width/2;
       let dy=finalY - rect.height/2;
       let distance=Math.sqrt(dx*dx+dy*dy);
@@ -221,7 +237,6 @@ function throwDart(event){
       if(throws===3) showResults();
     }
   }
-
   requestAnimationFrame(animate);
 }
 
@@ -243,5 +258,6 @@ function resetGame(){
 document.getElementById("board").addEventListener("click",throwDart);
 setupBoard();
 </script>
+
 </body>
 </html>
