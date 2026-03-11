@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dartboard Decisions</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:#0b1c2c;
+color:white;
+}
+
+h1{
+margin-top:10px;
+}
+
+#board{
+position:relative;
+margin:auto;
+width:500px;
+height:500px;
+border-radius:50%;
+background:
+conic-gradient(
+#c62828 0deg 16deg,
+#222 16deg 32deg,
+#c62828 32deg 48deg,
+#222 48deg 64deg,
+#c62828 64deg 80deg,
+#222 80deg 96deg,
+#c62828 96deg 112deg,
+#222 112deg 128deg,
+#c62828 128deg 144deg,
+#222 144deg 160deg,
+#c62828 160deg 176deg,
+#222 176deg 192deg,
+#c62828 192deg 208deg,
+#222 208deg 224deg,
+#c62828 224deg 240deg,
+#222 240deg 256deg,
+#c62828 256deg 272deg,
+#222 272deg 288deg,
+#c62828 288deg 304deg,
+#222 304deg 320deg,
+#c62828 320deg 336deg,
+#222 336deg 360deg
+);
+border:10px solid #333;
+cursor:crosshair;
+}
+
+.segment{
+position:absolute;
+left:50%;
+top:50%;
+transform-origin:0 0;
+font-size:12px;
+}
+
+#bull{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width:80px;
+height:80px;
+background:gold;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+color:black;
+font-weight:bold;
+text-align:center;
+}
+
+.dart{
+position:absolute;
+width:12px;
+height:12px;
+background:white;
+border-radius:50%;
+border:2px solid black;
+}
+
+#results{
+margin-top:20px;
+font-size:20px;
+}
+
+button{
+margin-top:15px;
+padding:10px 20px;
+font-size:16px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎯 Dartboard Decisions</h1>
+<p>Click the board to throw your dart</p>
+
+<div id="board">
+<div id="bull">Simon<br>Moat</div>
+</div>
+
+<div id="results"></div>
+
+<button onclick="resetGame()">New Game</button>
+
+<script>
+
+const names = [
+"Alex","Ben","Chris","Dan","Ethan","Finn","George","Harry",
+"Jack","James","Josh","Leo","Liam","Luke","Max","Noah",
+"Ollie","Ryan","Sam","Tom","Will","Zac"
+];
+
+let shuffled = [];
+let darts = [];
+let throws = 0;
+
+function shuffle(array){
+return array.sort(()=>Math.random()-0.5);
+}
+
+function setupBoard(){
+
+shuffled = shuffle([...names]);
+
+const board = document.getElementById("board");
+
+document.querySelectorAll(".segment").forEach(e=>e.remove());
+
+let angleStep = 360 / shuffled.length;
+
+shuffled.forEach((name,i)=>{
+
+let angle = i*angleStep;
+
+let label = document.createElement("div");
+label.className="segment";
+label.innerText=name;
+
+label.style.transform =
+"rotate("+angle+"deg) translate(200px) rotate(-"+angle+"deg)";
+
+board.appendChild(label);
+
+});
+
+}
+
+function throwDart(event){
+
+if(throws>=3) return;
+
+const board = document.getElementById("board");
+const rect = board.getBoundingClientRect();
+
+let x = event.clientX - rect.left;
+let y = event.clientY - rect.top;
+
+let dart = document.createElement("div");
+dart.className="dart";
+
+dart.style.left = x+"px";
+dart.style.top = y+"px";
+
+board.appendChild(dart);
+
+let centerX = rect.width/2;
+let centerY = rect.height/2;
+
+let dx = x-centerX;
+let dy = y-centerY;
+
+let distance = Math.sqrt(dx*dx+dy*dy);
+
+let result;
+
+if(distance < 40){
+
+result="Simon Moat";
+
+}else{
+
+let angle = Math.atan2(dy,dx)*(180/Math.PI);
+angle = (angle+360+90)%360;
+
+let segment = Math.floor(angle/(360/shuffled.length));
+
+result = shuffled[segment];
+
+}
+
+darts.push(result);
+
+throws++;
+
+if(throws===3){
+showResults();
+}
+
+}
+
+function showResults(){
+
+document.getElementById("results").innerHTML=
+"💋 Snog: "+darts[0]+"<br>"+
+"💍 Marry: "+darts[1]+"<br>"+
+"🚫 Avoid: "+darts[2];
+
+}
+
+function resetGame(){
+
+document.querySelectorAll(".dart").forEach(e=>e.remove());
+
+throws=0;
+darts=[];
+
+document.getElementById("results").innerHTML="";
+
+setupBoard();
+
+}
+
+document.getElementById("board").addEventListener("click",throwDart);
+
+setupBoard();
+
+</script>
+
+</body>
+</html>
