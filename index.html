@@ -2,15 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dartboard Decisions</title>
+<title>RMS Hunks Dartboard</title>
 
 <style>
 
 body{
 font-family:Arial;
-text-align:center;
 background:#0b1c2c;
 color:white;
+text-align:center;
 }
 
 h1{
@@ -19,37 +19,36 @@ margin-top:10px;
 
 #board{
 position:relative;
+width:520px;
+height:520px;
 margin:auto;
-width:500px;
-height:500px;
 border-radius:50%;
-background:
-conic-gradient(
-#c62828 0deg 16deg,
+border:10px solid #222;
+cursor:crosshair;
+background:conic-gradient(
+#b71c1c 0deg 16deg,
 #222 16deg 32deg,
-#c62828 32deg 48deg,
+#b71c1c 32deg 48deg,
 #222 48deg 64deg,
-#c62828 64deg 80deg,
+#b71c1c 64deg 80deg,
 #222 80deg 96deg,
-#c62828 96deg 112deg,
+#b71c1c 96deg 112deg,
 #222 112deg 128deg,
-#c62828 128deg 144deg,
+#b71c1c 128deg 144deg,
 #222 144deg 160deg,
-#c62828 160deg 176deg,
+#b71c1c 160deg 176deg,
 #222 176deg 192deg,
-#c62828 192deg 208deg,
+#b71c1c 192deg 208deg,
 #222 208deg 224deg,
-#c62828 224deg 240deg,
+#b71c1c 224deg 240deg,
 #222 240deg 256deg,
-#c62828 256deg 272deg,
+#b71c1c 256deg 272deg,
 #222 272deg 288deg,
-#c62828 288deg 304deg,
+#b71c1c 288deg 304deg,
 #222 304deg 320deg,
-#c62828 320deg 336deg,
+#b71c1c 320deg 336deg,
 #222 336deg 360deg
 );
-border:10px solid #333;
-cursor:crosshair;
 }
 
 .segment{
@@ -65,22 +64,22 @@ position:absolute;
 left:50%;
 top:50%;
 transform:translate(-50%,-50%);
-width:80px;
-height:80px;
+width:90px;
+height:90px;
 background:gold;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-color:black;
 font-weight:bold;
+color:black;
 text-align:center;
 }
 
 .dart{
 position:absolute;
-width:12px;
-height:12px;
+width:14px;
+height:14px;
 background:white;
 border-radius:50%;
 border:2px solid black;
@@ -88,7 +87,7 @@ border:2px solid black;
 
 #results{
 margin-top:20px;
-font-size:20px;
+font-size:22px;
 }
 
 button{
@@ -103,8 +102,8 @@ cursor:pointer;
 
 <body>
 
-<h1>🎯 Dartboard Decisions</h1>
-<p>Click the board to throw your dart</p>
+<h1>🎯 RMS Hunks Dartboard</h1>
+<p>Click the board to throw your darts</p>
 
 <div id="board">
 <div id="bull">Simon<br>Moat</div>
@@ -117,39 +116,41 @@ cursor:pointer;
 <script>
 
 const names = [
-"Alex","Ben","Chris","Dan","Ethan","Finn","George","Harry",
-"Jack","James","Josh","Leo","Liam","Luke","Max","Noah",
-"Ollie","Ryan","Sam","Tom","Will","Zac"
+"Matty Wright","David Jones","Jack Cochrane","Peter Clark","James Reay",
+"Brian Johnson","Kevin Stobbart","Matthew Scott","Bruce Walker","Tony Jiminez",
+"Michael Storey","Jack Raine","Alistair Bowman","Ash Bughio","Jamie Duprey",
+"Mark Lynskey","Michael Fox","Gordon Bird","Chris Fairbairn","Alan Reddy",
+"Andrew Toes","George Smith"
 ];
 
-let shuffled = [];
-let darts = [];
-let throws = 0;
+let shuffled=[];
+let darts=[];
+let throws=0;
 
-function shuffle(array){
-return array.sort(()=>Math.random()-0.5);
+function shuffle(arr){
+return arr.sort(()=>Math.random()-0.5);
 }
 
 function setupBoard(){
 
-shuffled = shuffle([...names]);
+shuffled=shuffle([...names]);
 
-const board = document.getElementById("board");
+const board=document.getElementById("board");
 
 document.querySelectorAll(".segment").forEach(e=>e.remove());
 
-let angleStep = 360 / shuffled.length;
+let angleStep=360/shuffled.length;
 
 shuffled.forEach((name,i)=>{
 
-let angle = i*angleStep;
+let angle=i*angleStep;
 
-let label = document.createElement("div");
+let label=document.createElement("div");
 label.className="segment";
 label.innerText=name;
 
-label.style.transform =
-"rotate("+angle+"deg) translate(200px) rotate(-"+angle+"deg)";
+label.style.transform=
+"rotate("+angle+"deg) translate(210px) rotate(-"+angle+"deg)";
 
 board.appendChild(label);
 
@@ -161,42 +162,52 @@ function throwDart(event){
 
 if(throws>=3) return;
 
-const board = document.getElementById("board");
-const rect = board.getBoundingClientRect();
+const board=document.getElementById("board");
+const rect=board.getBoundingClientRect();
 
-let x = event.clientX - rect.left;
-let y = event.clientY - rect.top;
+let clickX=event.clientX-rect.left;
+let clickY=event.clientY-rect.top;
 
-let dart = document.createElement("div");
+/* EXTREME CHAOS */
+
+let chaos=220;
+
+let finalX=clickX+(Math.random()*chaos-chaos/2);
+let finalY=clickY+(Math.random()*chaos-chaos/2);
+
+finalX=Math.max(0,Math.min(rect.width,finalX));
+finalY=Math.max(0,Math.min(rect.height,finalY));
+
+let dart=document.createElement("div");
 dart.className="dart";
 
-dart.style.left = x+"px";
-dart.style.top = y+"px";
+dart.style.left=finalX+"px";
+dart.style.top=finalY+"px";
 
 board.appendChild(dart);
 
-let centerX = rect.width/2;
-let centerY = rect.height/2;
+let centerX=rect.width/2;
+let centerY=rect.height/2;
 
-let dx = x-centerX;
-let dy = y-centerY;
+let dx=finalX-centerX;
+let dy=finalY-centerY;
 
-let distance = Math.sqrt(dx*dx+dy*dy);
+let distance=Math.sqrt(dx*dx+dy*dy);
 
 let result;
 
-if(distance < 40){
+if(distance<45){
 
 result="Simon Moat";
 
 }else{
 
-let angle = Math.atan2(dy,dx)*(180/Math.PI);
-angle = (angle+360+90)%360;
+let angle=Math.atan2(dy,dx)*(180/Math.PI);
+angle=(angle+360+90)%360;
 
-let segment = Math.floor(angle/(360/shuffled.length));
+let segment=Math.floor(angle/(360/shuffled.length));
 
-result = shuffled[segment];
+result=shuffled[segment];
 
 }
 
