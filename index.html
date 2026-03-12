@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RMS Hunks Arcade</title>
+<title>RMS Hunks Card Shooter</title>
 
 <style>
 
@@ -12,7 +12,6 @@ background:#060612;
 color:white;
 text-align:center;
 margin:0;
-overflow-x:hidden;
 }
 
 h1{
@@ -20,118 +19,88 @@ color:#00eaff;
 text-shadow:0 0 12px #00eaff,0 0 20px #ff00ff;
 }
 
-#board{
-position:relative;
-width:520px;
-height:520px;
+#table{
+width:900px;
 margin:40px auto;
-border-radius:50%;
-border:6px solid #00eaff;
-box-shadow:0 0 30px #00eaff,inset 0 0 40px #ff00ff;
-transition:transform 3s cubic-bezier(.2,.8,.2,1);
-background:conic-gradient(
-#ff0066 0deg 16deg,
-#111 16deg 32deg,
-#ff0066 32deg 48deg,
-#111 48deg 64deg,
-#ff0066 64deg 80deg,
-#111 80deg 96deg,
-#ff0066 96deg 112deg,
-#111 112deg 128deg,
-#ff0066 128deg 144deg,
-#111 144deg 160deg,
-#ff0066 160deg 176deg,
-#111 176deg 192deg,
-#ff0066 192deg 208deg,
-#111 208deg 224deg,
-#ff0066 224deg 240deg,
-#111 240deg 256deg,
-#ff0066 256deg 272deg,
-#111 272deg 288deg,
-#ff0066 288deg 304deg,
-#111 304deg 320deg,
-#ff0066 320deg 336deg,
-#111 336deg 360deg
-);
+display:grid;
+grid-template-columns:repeat(6,1fr);
+gap:25px;
+justify-items:center;
 }
 
-.segment{
-position:absolute;
-font-size:12px;
-color:#00eaff;
-text-shadow:0 0 6px #00eaff;
-background:rgba(0,0,0,0.6);
-padding:3px 6px;
-border-radius:6px;
-white-space:nowrap;
-transform-origin:center;
-}
-
-.segment.highlight{
-color:#ff00ff;
-text-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff;
-transform:scale(1.3);
-}
-
-#bull{
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-width:50px;
-height:50px;
-border-radius:50%;
-background:#00eaff;
+.card{
+position:relative;
+width:110px;
+height:150px;
+background:white;
 color:black;
-font-weight:bold;
+border-radius:10px;
+box-shadow:0 6px 14px rgba(0,0,0,.7);
+padding:6px;
 display:flex;
-align-items:center;
-justify-content:center;
-font-size:10px;
-box-shadow:0 0 20px #00eaff,0 0 40px #ff00ff;
+flex-direction:column;
+justify-content:space-between;
+font-weight:bold;
+transition:.2s;
 }
 
-/* BULLET HOLES */
+.rank{
+font-size:18px;
+}
+
+.suit{
+font-size:18px;
+}
+
+.name{
+text-align:center;
+font-size:12px;
+margin-top:10px;
+}
+
+.card.hit{
+animation:shake .3s;
+box-shadow:0 0 20px red;
+}
+
+@keyframes shake{
+0%{transform:translateX(0)}
+25%{transform:translateX(-5px)}
+50%{transform:translateX(5px)}
+75%{transform:translateX(-4px)}
+100%{transform:translateX(0)}
+}
 
 .bullet{
+position:absolute;
+width:10px;
+height:10px;
+background:yellow;
+border-radius:50%;
+box-shadow:0 0 12px yellow;
+pointer-events:none;
+}
+
+.hole{
 position:absolute;
 width:16px;
 height:16px;
 border-radius:50%;
-background:radial-gradient(circle,#000 30%,#444 50%,transparent 60%);
-box-shadow:0 0 6px #000;
+background:radial-gradient(circle,#000 40%,#333 60%,transparent 70%);
 }
 
-/* GLASS CRACK */
-
-.crack{
+.flash{
 position:absolute;
-width:120px;
-height:120px;
-border-radius:50%;
+width:60px;
+height:60px;
+background:radial-gradient(circle,white,transparent);
+animation:impact .4s forwards;
 pointer-events:none;
-background:
-radial-gradient(circle,transparent 40%,rgba(255,255,255,.3) 41%,transparent 42%);
-animation:fadeCrack 2s forwards;
 }
 
-@keyframes fadeCrack{
-0%{opacity:1}
-100%{opacity:0}
-}
-
-/* CONFETTI */
-
-.confetti{
-position:absolute;
-width:6px;
-height:6px;
-animation:fall 1.2s linear forwards;
-}
-
-@keyframes fall{
-0%{transform:translateY(0)}
-100%{transform:translateY(400px)}
+@keyframes impact{
+0%{opacity:1;transform:scale(.2)}
+100%{opacity:0;transform:scale(2)}
 }
 
 button{
@@ -143,25 +112,14 @@ border-radius:8px;
 cursor:pointer;
 color:black;
 font-weight:bold;
-box-shadow:0 0 10px #00eaff;
 margin:10px;
 }
 
-/* SCOREBOARD */
-
 #results{
-margin-top:20px;
+margin-top:30px;
 font-size:24px;
 color:#00eaff;
-text-shadow:0 0 12px #00eaff;
-opacity:0;
-transform:scale(.8);
-transition:.6s;
-}
-
-#results.show{
-opacity:1;
-transform:scale(1);
+text-shadow:0 0 10px #00eaff;
 }
 
 </style>
@@ -169,12 +127,10 @@ transform:scale(1);
 
 <body>
 
-<h1>🎯 RMS Hunks Dartboard Arcade</h1>
-<p>Throw 3 shots to decide your fate</p>
+<h1>🎯 RMS Hunks Card Shooter</h1>
+<p>Shoot 3 cards to decide your fate</p>
 
-<div id="board">
-<div id="bull">Simon<br>Moat</div>
-</div>
+<div id="table"></div>
 
 <button onclick="shoot()">Shoot</button>
 <button onclick="resetGame()">New Game</button>
@@ -195,62 +151,42 @@ const names=[
 "Andrew Toes","George Smith"
 ];
 
-let shuffled=[];
-let results=[];
+const suits=["♠","♥","♦","♣"];
+const ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+
+let cards=[];
 let shots=0;
-let rotation=0;
+let results=[];
 
-const board=document.getElementById("board");
+const table=document.getElementById("table");
 
-function shuffle(arr){
-return [...arr].sort(()=>Math.random()-0.5);
-}
+function setup(){
 
-function setupBoard(){
+table.innerHTML="";
+cards=[];
+shots=0;
+results=[];
 
-shuffled=shuffle(names);
+document.getElementById("results").innerHTML="";
 
-document.querySelectorAll(".segment").forEach(e=>e.remove());
+names.forEach(name=>{
 
-let step=360/shuffled.length;
+let suit=suits[Math.floor(Math.random()*4)];
+let rank=ranks[Math.floor(Math.random()*13)];
 
-shuffled.forEach((name,i)=>{
+let card=document.createElement("div");
+card.className="card";
 
-let angle=i*step;
+card.innerHTML=
+`<div class="rank">${rank}${suit}</div>
+<div class="name">${name}</div>
+<div class="rank">${rank}${suit}</div>`;
 
-let label=document.createElement("div");
-label.className="segment";
-label.innerText=name;
+table.appendChild(card);
 
-let r=210;
-
-let rad=angle*Math.PI/180;
-
-label.style.left=260+r*Math.cos(rad)-30+"px";
-label.style.top=260+r*Math.sin(rad)-10+"px";
-label.style.transform=`rotate(${angle}deg)`;
-
-board.appendChild(label);
+cards.push({name,el:card});
 
 });
-
-}
-
-function confetti(){
-
-for(let i=0;i<40;i++){
-
-let c=document.createElement("div");
-c.className="confetti";
-
-c.style.left=Math.random()*520+"px";
-c.style.background=["#ff0","#0ff","#0f0","#f0f","#f00"][Math.floor(Math.random()*5)];
-
-board.appendChild(c);
-
-setTimeout(()=>c.remove(),1200);
-
-}
 
 }
 
@@ -258,98 +194,90 @@ function shoot(){
 
 if(shots>=3)return;
 
-let step=360/shuffled.length;
+let index=Math.floor(Math.random()*cards.length);
+let card=cards[index];
 
-let spin=360*3+Math.random()*360;
+let rect=card.el.getBoundingClientRect();
+let tableRect=table.getBoundingClientRect();
 
-rotation+=spin;
+let targetX=rect.left-tableRect.left+rect.width/2;
+let targetY=rect.top-tableRect.top+rect.height/2;
 
-board.style.transition="transform 3s cubic-bezier(.2,.8,.2,1)";
-board.style.transform=`rotate(${rotation}deg)`;
+let bullet=document.createElement("div");
+bullet.className="bullet";
+table.appendChild(bullet);
 
-let finalRot=rotation%360;
+let startX=Math.random()*900;
+let startY=700;
 
-let index=Math.floor((360-finalRot)/step)%shuffled.length;
+let step=0;
 
-document.querySelectorAll(".segment").forEach((el,i)=>{
-el.classList.toggle("highlight",i===index);
-});
+function animate(){
 
-setTimeout(()=>{
+step+=0.04;
 
-let angle=(index*step+finalRot)*Math.PI/180;
+let x=startX+(targetX-startX)*step;
+let y=startY+(targetY-startY)*step;
 
-let x=260+Math.cos(angle)*180;
-let y=260+Math.sin(angle)*180;
+bullet.style.left=x+"px";
+bullet.style.top=y+"px";
 
-let hole=document.createElement("div");
-hole.className="bullet";
-hole.style.left=x+"px";
-hole.style.top=y+"px";
-board.appendChild(hole);
+if(step<1){
+requestAnimationFrame(animate);
+}else{
 
-let crack=document.createElement("div");
-crack.className="crack";
-crack.style.left=x-50+"px";
-crack.style.top=y-50+"px";
-board.appendChild(crack);
+bullet.remove();
+impact(card,targetX,targetY);
 
-document.getElementById("shot").play();
+results.push(card.name);
+shots++;
 
-let name=shuffled[index];
-
-if(Math.random()<0.05){
-
-name="Simon Moat";
-
-board.style.transition="transform 4s";
-confetti();
+if(shots===3) showResults();
 
 }
 
-results.push(name);
-shots++;
+}
 
-if(shots===3)showResults();
+animate();
 
-},3000);
+}
+
+function impact(card,x,y){
+
+document.getElementById("shot").play();
+
+card.el.classList.add("hit");
+
+let hole=document.createElement("div");
+hole.className="hole";
+hole.style.left=x-8+"px";
+hole.style.top=y-8+"px";
+table.appendChild(hole);
+
+let flash=document.createElement("div");
+flash.className="flash";
+flash.style.left=x-30+"px";
+flash.style.top=y-30+"px";
+table.appendChild(flash);
+
+setTimeout(()=>flash.remove(),400);
 
 }
 
 function showResults(){
 
-let r=document.getElementById("results");
-
-r.innerHTML=
+document.getElementById("results").innerHTML=
 "💋 Snog: "+results[0]+"<br>"+
 "💍 Marry: "+results[1]+"<br>"+
 "🚫 Avoid: "+results[2];
 
-setTimeout(()=>r.classList.add("show"),200);
-
 }
 
 function resetGame(){
-
-document.querySelectorAll(".bullet").forEach(e=>e.remove());
-document.querySelectorAll(".crack").forEach(e=>e.remove());
-document.querySelectorAll(".segment").forEach(e=>e.classList.remove("highlight"));
-
-shots=0;
-results=[];
-
-rotation=0;
-
-board.style.transform="rotate(0deg)";
-
-document.getElementById("results").classList.remove("show");
-document.getElementById("results").innerHTML="";
-
-setupBoard();
-
+setup();
 }
 
-setupBoard();
+setup();
 
 </script>
 
