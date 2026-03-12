@@ -3,160 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <title>RMS Hunks Dartboard Arcade</title>
+
 <style>
-body {
-  font-family: Arial;
-  background:#060612;
-  color:white;
-  text-align:center;
-  margin:0;
+
+body{
+font-family:Arial;
+background:#060612;
+color:white;
+text-align:center;
+margin:0;
 }
-h1 {
-  color:#00eaff;
-  text-shadow:0 0 12px #00eaff, 0 0 20px #ff00ff;
+
+h1{
+color:#00eaff;
+text-shadow:0 0 12px #00eaff,0 0 20px #ff00ff;
 }
-#board {
-  position: relative;
-  width:520px;
-  height:520px;
-  margin:30px auto;
-  border-radius:50%;
-  border:6px solid #00eaff;
-  box-shadow:
-    0 0 25px #00eaff,
-    inset 0 0 40px #ff00ff;
-  background:conic-gradient(
-    #ff0066 0deg 16deg,
-    #111 16deg 32deg,
-    #ff0066 32deg 48deg,
-    #111 48deg 64deg,
-    #ff0066 64deg 80deg,
-    #111 80deg 96deg,
-    #ff0066 96deg 112deg,
-    #111 112deg 128deg,
-    #ff0066 128deg 144deg,
-    #111 144deg 160deg,
-    #ff0066 160deg 176deg,
-    #111 176deg 192deg,
-    #ff0066 192deg 208deg,
-    #111 208deg 224deg,
-    #ff0066 224deg 240deg,
-    #111 240deg 256deg,
-    #ff0066 256deg 272deg,
-    #111 272deg 288deg,
-    #ff0066 288deg 304deg,
-    #111 304deg 320deg,
-    #ff0066 320deg 336deg,
-    #111 336deg 360deg
-  );
-  transition: transform 1s ease-out;
+
+#board{
+position:relative;
+width:520px;
+height:520px;
+margin:30px auto;
+border-radius:50%;
+border:6px solid #00eaff;
+box-shadow:0 0 25px #00eaff,inset 0 0 40px #ff00ff;
+transition:transform 2s cubic-bezier(.2,.8,.2,1);
+background:conic-gradient(
+#ff0066 0deg 16deg,
+#111 16deg 32deg,
+#ff0066 32deg 48deg,
+#111 48deg 64deg,
+#ff0066 64deg 80deg,
+#111 80deg 96deg,
+#ff0066 96deg 112deg,
+#111 112deg 128deg,
+#ff0066 128deg 144deg,
+#111 144deg 160deg,
+#ff0066 160deg 176deg,
+#111 176deg 192deg,
+#ff0066 192deg 208deg,
+#111 208deg 224deg,
+#ff0066 224deg 240deg,
+#111 240deg 256deg,
+#ff0066 256deg 272deg,
+#111 272deg 288deg,
+#ff0066 288deg 304deg,
+#111 304deg 320deg,
+#ff0066 320deg 336deg,
+#111 336deg 360deg
+);
 }
-.segment {
-  position: absolute;
-  left:50%;
-  top:50%;
-  transform-origin:0 0;
-  font-size:12px;
-  padding:3px 6px;
-  background:rgba(0,0,0,0.6);
-  border-radius:6px;
-  white-space:nowrap;
-  color:#00eaff;
-  text-shadow:0 0 6px #00eaff;
-  transition: all 0.3s;
+
+.segment{
+position:absolute;
+font-size:12px;
+color:#00eaff;
+text-shadow:0 0 6px #00eaff;
+background:rgba(0,0,0,0.6);
+padding:3px 6px;
+border-radius:6px;
+white-space:nowrap;
+transform-origin:center;
 }
-.segment.highlight {
-  color:#ff00ff;
-  text-shadow:0 0 10px #ff00ff, 0 0 20px #ff00ff;
-  transform: scale(1.3) rotate(var(--angle));
+
+.segment.highlight{
+color:#ff00ff;
+text-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff;
+transform:scale(1.3);
 }
-#bull {
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  background:#00eaff;
-  color:black;
-  font-weight:bold;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;
-  box-shadow:0 0 20px #00eaff, 0 0 40px #ff00ff;
+
+#bull{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width:50px;
+height:50px;
+border-radius:50%;
+background:#00eaff;
+color:black;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:10px;
+box-shadow:0 0 20px #00eaff,0 0 40px #ff00ff;
 }
-.dart {
-  position:absolute;
-  width:6px;
-  height:40px;
-  background:white;
-  border-radius:2px;
-  transform-origin:bottom center;
+
+.dart{
+position:absolute;
+width:2px;
+height:70px;
+background:#ddd;
+transform-origin:bottom center;
 }
-.dart::before {
-  content:"";
-  position:absolute;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  border-left:5px solid transparent;
-  border-right:5px solid transparent;
-  border-bottom:12px solid #ff0066;
+
+.dart .barrel{
+position:absolute;
+bottom:25px;
+left:50%;
+transform:translateX(-50%);
+width:6px;
+height:12px;
+background:linear-gradient(#bbb,#eee,#bbb);
+border-radius:2px;
 }
-.dart::after {
-  content:"";
-  position:absolute;
-  top:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:10px;
-  height:10px;
-  background:#00eaff;
-  clip-path:polygon(50% 0%,0% 100%,100% 100%);
+
+.dart:before{
+content:"";
+position:absolute;
+bottom:-10px;
+left:50%;
+transform:translateX(-50%);
+border-left:3px solid transparent;
+border-right:3px solid transparent;
+border-top:10px solid silver;
 }
-button {
-  padding:14px 28px;
-  font-size:18px;
-  background:#00eaff;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  color:black;
-  font-weight:bold;
-  box-shadow:0 0 10px #00eaff;
-  margin-top:10px;
+
+.dart:after{
+content:"";
+position:absolute;
+top:-10px;
+left:50%;
+transform:translateX(-50%);
+width:16px;
+height:12px;
+background:#ff0066;
+clip-path:polygon(50% 0%,0% 100%,100% 100%);
 }
-button:hover {
-  transform:scale(1.05);
+
+.trail{
+position:absolute;
+width:4px;
+height:4px;
+background:#00eaff;
+border-radius:50%;
+opacity:.8;
 }
-#results {
-  margin-top:20px;
-  font-size:22px;
-  color:#00eaff;
-  text-shadow:0 0 10px #00eaff;
+
+button{
+padding:14px 28px;
+font-size:18px;
+background:#00eaff;
+border:none;
+border-radius:8px;
+cursor:pointer;
+color:black;
+font-weight:bold;
+box-shadow:0 0 10px #00eaff;
+margin:10px;
 }
-.confetti {
-  position:absolute;
-  width:6px;
-  height:6px;
-  background: #ff0;
-  animation: fall 1s linear forwards;
+
+#results{
+margin-top:20px;
+font-size:22px;
+color:#00eaff;
+text-shadow:0 0 10px #00eaff;
+opacity:0;
+transform:translateY(20px);
+transition:.6s;
 }
-@keyframes fall {
-  0% {transform: translateY(0px);}
-  100% {transform: translateY(400px);}
+
+#results.show{
+opacity:1;
+transform:translateY(0);
 }
+
+.confetti{
+position:absolute;
+width:6px;
+height:6px;
+animation:fall 1s linear forwards;
+}
+
+@keyframes fall{
+0%{transform:translateY(0)}
+100%{transform:translateY(400px)}
+}
+
 </style>
 </head>
+
 <body>
 
 <h1>🎯 RMS Hunks Dartboard Arcade</h1>
 <p>Throw 3 darts to decide your fate</p>
 
 <div id="board">
-  <div id="bull">Simon<br>Moat</div>
+<div id="bull">Simon<br>Moat</div>
 </div>
 
 <button onclick="throwDart()">Throw Dart</button>
@@ -164,7 +198,12 @@ button:hover {
 
 <div id="results"></div>
 
+<audio id="thud">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9e3d9c4b6e.mp3">
+</audio>
+
 <script>
+
 const names=[
 "Matty Wright","David Jones","Jack Cochrane","Peter Clark","James Reay",
 "Brian Johnson","Kevin Stobbart","Matthew Scott","Bruce Walker","Tony Jiminez",
@@ -176,111 +215,189 @@ const names=[
 let shuffled=[];
 let darts=[];
 let throws=0;
+let currentRotation=0;
+
 const board=document.getElementById("board");
 
-function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+function shuffle(a){
+return [...a].sort(()=>Math.random()-0.5);
+}
 
 function setupBoard(){
-  shuffled=shuffle([...names]);
-  document.querySelectorAll(".segment").forEach(e=>e.remove());
-  let step=360/shuffled.length;
-  shuffled.forEach((name,i)=>{
-    let angle=i*step;
-    let label=document.createElement("div");
-    label.className="segment";
-    label.innerText=name;
-    label.style.setProperty("--angle", angle+"deg");
-    let radius=210;
-    let rad=angle*Math.PI/180;
-    let x=260+radius*Math.cos(rad)-30;
-    let y=260+radius*Math.sin(rad)-10;
-    label.style.left=x+"px";
-    label.style.top=y+"px";
-    label.style.transform="rotate("+angle+"deg)";
-    board.appendChild(label);
-  });
+
+shuffled=shuffle(names);
+
+document.querySelectorAll(".segment").forEach(e=>e.remove());
+
+let step=360/shuffled.length;
+
+shuffled.forEach((name,i)=>{
+
+let angle=i*step;
+
+let label=document.createElement("div");
+label.className="segment";
+label.innerText=name;
+
+let radius=210;
+
+let rad=angle*Math.PI/180;
+
+label.style.left=260+radius*Math.cos(rad)-30+"px";
+label.style.top=260+radius*Math.sin(rad)-10+"px";
+label.style.transform=`rotate(${angle}deg)`;
+
+board.appendChild(label);
+
+});
+
 }
 
-// Bullseye confetti effect
 function confettiBurst(){
-  for(let i=0;i<30;i++){
-    let c=document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*520+"px";
-    c.style.background=["#ff0","#ff0ff","#0ff","#0f0","#f00"][Math.floor(Math.random()*5)];
-    board.appendChild(c);
-    setTimeout(()=>c.remove(),1000);
-  }
+
+for(let i=0;i<40;i++){
+
+let c=document.createElement("div");
+c.className="confetti";
+
+c.style.left=Math.random()*520+"px";
+c.style.background=["#ff0","#0ff","#0f0","#f0f","#f00"][Math.floor(Math.random()*5)];
+
+board.appendChild(c);
+
+setTimeout(()=>c.remove(),1000);
+
 }
 
-// Throw dart with spinning + random landing
+}
+
 function throwDart(){
-  if(throws>=3) return;
-  // Spin animation
-  let rotation=Math.random()*720+360;
-  board.style.transition="transform 1s ease-out";
-  board.style.transform=`rotate(${rotation}deg)`;
 
-  // Highlight segment
-  let highlightIndex=Math.floor(Math.random()*shuffled.length);
-  document.querySelectorAll(".segment").forEach((el,i)=>{
-    el.classList.remove("highlight");
-    if(i===highlightIndex) el.classList.add("highlight");
-  });
+if(throws>=3)return;
 
-  setTimeout(()=>{
-    // Dart lands
-    let name=shuffled[highlightIndex];
-    if(Math.random()<0.05) name="Simon Moat";
+let step=360/shuffled.length;
 
-    // Add dart flying in
-    let dart=document.createElement("div");
-    dart.className="dart";
-    board.appendChild(dart);
-    let startX=-50;
-    let startY=Math.random()*520;
-    let rect=board.getBoundingClientRect();
-    let step=0;
-    let duration=600;
-    let targetX=rect.width/2 + Math.cos(highlightIndex*2*Math.PI/shuffled.length)*180;
-    let targetY=rect.height/2 + Math.sin(highlightIndex*2*Math.PI/shuffled.length)*180;
-    function animate(time){
-      step+=16/duration;
-      if(step>1) step=1;
-      dart.style.left=startX+(targetX-startX)*step+"px";
-      dart.style.top=startY+(targetY-startY)*step+"px";
-      dart.style.transform=`rotate(${Math.atan2(targetY-startY,targetX-startX)*180/Math.PI}deg)`;
-      if(step<1) requestAnimationFrame(animate);
-      else {
-        darts.push(name);
-        throws++;
-        if(name==="Simon Moat") confettiBurst();
-        if(throws===3) showResults();
-      }
-    }
-    requestAnimationFrame(animate);
+let spin=360*3+Math.random()*360;
 
-  },1000);
+currentRotation+=spin;
+
+board.style.transform=`rotate(${currentRotation}deg)`;
+
+let finalRotation=currentRotation%360;
+
+let index=Math.floor((360-finalRotation)/step)%shuffled.length;
+
+document.querySelectorAll(".segment").forEach((el,i)=>{
+el.classList.toggle("highlight",i===index);
+});
+
+setTimeout(()=>{
+
+let name=shuffled[index];
+
+if(Math.random()<0.05) name="Simon Moat";
+
+let dart=document.createElement("div");
+dart.className="dart";
+
+let barrel=document.createElement("div");
+barrel.className="barrel";
+
+dart.appendChild(barrel);
+board.appendChild(dart);
+
+let startX=-50;
+let startY=Math.random()*520;
+
+let targetX=260+Math.cos(index*2*Math.PI/shuffled.length)*180;
+let targetY=260+Math.sin(index*2*Math.PI/shuffled.length)*180;
+
+let stepAnim=0;
+
+function animate(){
+
+stepAnim+=0.03;
+
+let x=startX+(targetX-startX)*stepAnim;
+let y=startY+(targetY-startY)*stepAnim;
+
+dart.style.left=x+"px";
+dart.style.top=y+"px";
+
+dart.style.transform=`rotate(${Math.atan2(targetY-startY,targetX-startX)*180/Math.PI}deg)`;
+
+let trail=document.createElement("div");
+trail.className="trail";
+trail.style.left=x+"px";
+trail.style.top=y+"px";
+board.appendChild(trail);
+setTimeout(()=>trail.remove(),300);
+
+if(stepAnim<1){
+
+requestAnimationFrame(animate);
+
+}else{
+
+document.getElementById("thud").play();
+
+if(name==="Simon Moat"){
+
+board.style.transition="transform 3s";
+confettiBurst();
+
+}
+
+darts.push(name);
+throws++;
+
+if(throws===3) showResults();
+
+}
+
+}
+
+animate();
+
+},2000);
+
 }
 
 function showResults(){
-  document.getElementById("results").innerHTML=
-    "💋 Snog: "+darts[0]+"<br>"+
-    "💍 Marry: "+darts[1]+"<br>"+
-    "🚫 Avoid: "+darts[2];
+
+let r=document.getElementById("results");
+
+r.innerHTML=
+"💋 Snog: "+darts[0]+"<br>"+
+"💍 Marry: "+darts[1]+"<br>"+
+"🚫 Avoid: "+darts[2];
+
+setTimeout(()=>r.classList.add("show"),200);
+
 }
 
 function resetGame(){
-  document.querySelectorAll(".dart").forEach(e=>e.remove());
-  document.querySelectorAll(".segment").forEach(e=>e.classList.remove("highlight"));
-  throws=0;
-  darts=[];
-  document.getElementById("results").innerHTML="";
-  board.style.transform="rotate(0deg)";
-  setupBoard();
+
+document.querySelectorAll(".dart").forEach(e=>e.remove());
+document.querySelectorAll(".trail").forEach(e=>e.remove());
+document.querySelectorAll(".segment").forEach(e=>e.classList.remove("highlight"));
+
+throws=0;
+darts=[];
+
+document.getElementById("results").classList.remove("show");
+document.getElementById("results").innerHTML="";
+
+currentRotation=0;
+
+board.style.transform="rotate(0deg)";
+
+setupBoard();
+
 }
 
 setupBoard();
+
 </script>
 
 </body>
