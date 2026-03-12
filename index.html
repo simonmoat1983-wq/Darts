@@ -1,8 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RMS Hunks Card Shooter</title>
+<title>RMS Hunks Shooting Gallery</title>
 
 <style>
 
@@ -26,7 +27,10 @@ display:grid;
 grid-template-columns:repeat(6,1fr);
 gap:25px;
 justify-items:center;
+position:relative;
 }
+
+/* CARD */
 
 .card{
 position:relative;
@@ -41,14 +45,11 @@ display:flex;
 flex-direction:column;
 justify-content:space-between;
 font-weight:bold;
+transform-origin:top center;
 transition:.2s;
 }
 
 .rank{
-font-size:18px;
-}
-
-.suit{
 font-size:18px;
 }
 
@@ -58,18 +59,23 @@ font-size:12px;
 margin-top:10px;
 }
 
-.card.hit{
-animation:shake .3s;
-box-shadow:0 0 20px red;
+.card.target{
+box-shadow:0 0 20px #ff0000;
 }
 
-@keyframes shake{
-0%{transform:translateX(0)}
-25%{transform:translateX(-5px)}
-50%{transform:translateX(5px)}
-75%{transform:translateX(-4px)}
-100%{transform:translateX(0)}
+.card.hit{
+animation:swing .6s ease-out;
 }
+
+@keyframes swing{
+0%{transform:rotate(0deg)}
+25%{transform:rotate(-8deg)}
+50%{transform:rotate(6deg)}
+75%{transform:rotate(-4deg)}
+100%{transform:rotate(0deg)}
+}
+
+/* BULLET */
 
 .bullet{
 position:absolute;
@@ -81,6 +87,18 @@ box-shadow:0 0 12px yellow;
 pointer-events:none;
 }
 
+/* LASER */
+
+.laser{
+position:absolute;
+height:2px;
+background:red;
+box-shadow:0 0 8px red;
+pointer-events:none;
+}
+
+/* BULLET HOLE */
+
 .hole{
 position:absolute;
 width:16px;
@@ -88,6 +106,8 @@ height:16px;
 border-radius:50%;
 background:radial-gradient(circle,#000 40%,#333 60%,transparent 70%);
 }
+
+/* IMPACT FLASH */
 
 .flash{
 position:absolute;
@@ -101,6 +121,23 @@ pointer-events:none;
 @keyframes impact{
 0%{opacity:1;transform:scale(.2)}
 100%{opacity:0;transform:scale(2)}
+}
+
+/* REVOLVER */
+
+#revolver{
+font-size:40px;
+margin-top:10px;
+animation:none;
+}
+
+.spin{
+animation:cylinder .6s linear;
+}
+
+@keyframes cylinder{
+0%{transform:rotate(0deg)}
+100%{transform:rotate(360deg)}
 }
 
 button{
@@ -127,8 +164,10 @@ text-shadow:0 0 10px #00eaff;
 
 <body>
 
-<h1>🎯 RMS Hunks Card Shooter</h1>
+<h1>🎯 RMS Hunks Shooting Gallery</h1>
 <p>Shoot 3 cards to decide your fate</p>
+
+<div id="revolver">🔫</div>
 
 <div id="table"></div>
 
@@ -159,6 +198,7 @@ let shots=0;
 let results=[];
 
 const table=document.getElementById("table");
+const gun=document.getElementById("revolver");
 
 function setup(){
 
@@ -166,7 +206,6 @@ table.innerHTML="";
 cards=[];
 shots=0;
 results=[];
-
 document.getElementById("results").innerHTML="";
 
 names.forEach(name=>{
@@ -192,39 +231,62 @@ cards.push({name,el:card});
 
 function shoot(){
 
-if(shots>=3)return;
+if(shots>=3) return;
+
+gun.classList.add("spin");
+setTimeout(()=>gun.classList.remove("spin"),600);
 
 let index=Math.floor(Math.random()*cards.length);
 let card=cards[index];
 
+document.querySelectorAll(".card").forEach(c=>c.classList.remove("target"));
+card.el.classList.add("target");
+
 let rect=card.el.getBoundingClientRect();
 let tableRect=table.getBoundingClientRect();
 
-let targetX=rect.left-tableRect.left+rect.width/2;
-let targetY=rect.top-tableRect.top+rect.height/2;
+let targetX=(rect.left-tableRect.left)+(rect.width/2);
+let targetY=(rect.top-tableRect.top)+(rect.height/2);
+
+/* LASER SIGHT */
+
+let laser=document.createElement("div");
+laser.className="laser";
+laser.style.left="0px";
+laser.style.top=targetY+"px";
+laser.style.width=targetX+"px";
+
+table.appendChild(laser);
+
+setTimeout(()=>laser.remove(),400);
+
+/* BULLET */
+
+setTimeout(()=>{
 
 let bullet=document.createElement("div");
 bullet.className="bullet";
 table.appendChild(bullet);
 
-let startX=Math.random()*900;
-let startY=700;
+let startX=Math.random()*table.offsetWidth;
+let startY=table.offsetHeight+50;
 
-let step=0;
+let progress=0;
 
 function animate(){
 
-step+=0.04;
+progress+=0.05;
 
-let x=startX+(targetX-startX)*step;
-let y=startY+(targetY-startY)*step;
+let x=startX+(targetX-startX)*progress;
+let y=startY+(targetY-startY)*progress;
 
 bullet.style.left=x+"px";
 bullet.style.top=y+"px";
 
-if(step<1){
+if(progress<1){
 requestAnimationFrame(animate);
-}else{
+}
+else{
 
 bullet.remove();
 impact(card,targetX,targetY);
@@ -240,24 +302,27 @@ if(shots===3) showResults();
 
 animate();
 
+},400);
+
 }
 
 function impact(card,x,y){
 
 document.getElementById("shot").play();
 
+card.el.classList.remove("target");
 card.el.classList.add("hit");
 
 let hole=document.createElement("div");
 hole.className="hole";
-hole.style.left=x-8+"px";
-hole.style.top=y-8+"px";
+hole.style.left=(x-8)+"px";
+hole.style.top=(y-8)+"px";
 table.appendChild(hole);
 
 let flash=document.createElement("div");
 flash.className="flash";
-flash.style.left=x-30+"px";
-flash.style.top=y-30+"px";
+flash.style.left=(x-30)+"px";
+flash.style.top=(y-30)+"px";
 table.appendChild(flash);
 
 setTimeout(()=>flash.remove(),400);
@@ -283,3 +348,4 @@ setup();
 
 </body>
 </html>
+```
