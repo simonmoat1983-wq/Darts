@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RMS Hunks Dartboard Arcade</title>
+<title>RMS Hunks Arcade</title>
 
 <style>
 
@@ -12,6 +12,7 @@ background:#060612;
 color:white;
 text-align:center;
 margin:0;
+overflow-x:hidden;
 }
 
 h1{
@@ -23,11 +24,11 @@ text-shadow:0 0 12px #00eaff,0 0 20px #ff00ff;
 position:relative;
 width:520px;
 height:520px;
-margin:30px auto;
+margin:40px auto;
 border-radius:50%;
 border:6px solid #00eaff;
-box-shadow:0 0 25px #00eaff,inset 0 0 40px #ff00ff;
-transition:transform 2s cubic-bezier(.2,.8,.2,1);
+box-shadow:0 0 30px #00eaff,inset 0 0 40px #ff00ff;
+transition:transform 3s cubic-bezier(.2,.8,.2,1);
 background:conic-gradient(
 #ff0066 0deg 16deg,
 #111 16deg 32deg,
@@ -90,55 +91,47 @@ font-size:10px;
 box-shadow:0 0 20px #00eaff,0 0 40px #ff00ff;
 }
 
-.dart{
-position:absolute;
-width:2px;
-height:70px;
-background:#ddd;
-transform-origin:bottom center;
-}
+/* BULLET HOLES */
 
-.dart .barrel{
+.bullet{
 position:absolute;
-bottom:25px;
-left:50%;
-transform:translateX(-50%);
-width:6px;
-height:12px;
-background:linear-gradient(#bbb,#eee,#bbb);
-border-radius:2px;
-}
-
-.dart:before{
-content:"";
-position:absolute;
-bottom:-10px;
-left:50%;
-transform:translateX(-50%);
-border-left:3px solid transparent;
-border-right:3px solid transparent;
-border-top:10px solid silver;
-}
-
-.dart:after{
-content:"";
-position:absolute;
-top:-10px;
-left:50%;
-transform:translateX(-50%);
 width:16px;
-height:12px;
-background:#ff0066;
-clip-path:polygon(50% 0%,0% 100%,100% 100%);
+height:16px;
+border-radius:50%;
+background:radial-gradient(circle,#000 30%,#444 50%,transparent 60%);
+box-shadow:0 0 6px #000;
 }
 
-.trail{
+/* GLASS CRACK */
+
+.crack{
 position:absolute;
-width:4px;
-height:4px;
-background:#00eaff;
+width:120px;
+height:120px;
 border-radius:50%;
-opacity:.8;
+pointer-events:none;
+background:
+radial-gradient(circle,transparent 40%,rgba(255,255,255,.3) 41%,transparent 42%);
+animation:fadeCrack 2s forwards;
+}
+
+@keyframes fadeCrack{
+0%{opacity:1}
+100%{opacity:0}
+}
+
+/* CONFETTI */
+
+.confetti{
+position:absolute;
+width:6px;
+height:6px;
+animation:fall 1.2s linear forwards;
+}
+
+@keyframes fall{
+0%{transform:translateY(0)}
+100%{transform:translateY(400px)}
 }
 
 button{
@@ -154,31 +147,21 @@ box-shadow:0 0 10px #00eaff;
 margin:10px;
 }
 
+/* SCOREBOARD */
+
 #results{
 margin-top:20px;
-font-size:22px;
+font-size:24px;
 color:#00eaff;
-text-shadow:0 0 10px #00eaff;
+text-shadow:0 0 12px #00eaff;
 opacity:0;
-transform:translateY(20px);
+transform:scale(.8);
 transition:.6s;
 }
 
 #results.show{
 opacity:1;
-transform:translateY(0);
-}
-
-.confetti{
-position:absolute;
-width:6px;
-height:6px;
-animation:fall 1s linear forwards;
-}
-
-@keyframes fall{
-0%{transform:translateY(0)}
-100%{transform:translateY(400px)}
+transform:scale(1);
 }
 
 </style>
@@ -187,18 +170,18 @@ animation:fall 1s linear forwards;
 <body>
 
 <h1>🎯 RMS Hunks Dartboard Arcade</h1>
-<p>Throw 3 darts to decide your fate</p>
+<p>Throw 3 shots to decide your fate</p>
 
 <div id="board">
 <div id="bull">Simon<br>Moat</div>
 </div>
 
-<button onclick="throwDart()">Throw Dart</button>
+<button onclick="shoot()">Shoot</button>
 <button onclick="resetGame()">New Game</button>
 
 <div id="results"></div>
 
-<audio id="thud">
+<audio id="shot">
 <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9e3d9c4b6e.mp3">
 </audio>
 
@@ -213,14 +196,14 @@ const names=[
 ];
 
 let shuffled=[];
-let darts=[];
-let throws=0;
-let currentRotation=0;
+let results=[];
+let shots=0;
+let rotation=0;
 
 const board=document.getElementById("board");
 
-function shuffle(a){
-return [...a].sort(()=>Math.random()-0.5);
+function shuffle(arr){
+return [...arr].sort(()=>Math.random()-0.5);
 }
 
 function setupBoard(){
@@ -239,12 +222,12 @@ let label=document.createElement("div");
 label.className="segment";
 label.innerText=name;
 
-let radius=210;
+let r=210;
 
 let rad=angle*Math.PI/180;
 
-label.style.left=260+radius*Math.cos(rad)-30+"px";
-label.style.top=260+radius*Math.sin(rad)-10+"px";
+label.style.left=260+r*Math.cos(rad)-30+"px";
+label.style.top=260+r*Math.sin(rad)-10+"px";
 label.style.transform=`rotate(${angle}deg)`;
 
 board.appendChild(label);
@@ -253,7 +236,7 @@ board.appendChild(label);
 
 }
 
-function confettiBurst(){
+function confetti(){
 
 for(let i=0;i<40;i++){
 
@@ -265,27 +248,28 @@ c.style.background=["#ff0","#0ff","#0f0","#f0f","#f00"][Math.floor(Math.random()
 
 board.appendChild(c);
 
-setTimeout(()=>c.remove(),1000);
+setTimeout(()=>c.remove(),1200);
 
 }
 
 }
 
-function throwDart(){
+function shoot(){
 
-if(throws>=3)return;
+if(shots>=3)return;
 
 let step=360/shuffled.length;
 
 let spin=360*3+Math.random()*360;
 
-currentRotation+=spin;
+rotation+=spin;
 
-board.style.transform=`rotate(${currentRotation}deg)`;
+board.style.transition="transform 3s cubic-bezier(.2,.8,.2,1)";
+board.style.transform=`rotate(${rotation}deg)`;
 
-let finalRotation=currentRotation%360;
+let finalRot=rotation%360;
 
-let index=Math.floor((360-finalRotation)/step)%shuffled.length;
+let index=Math.floor((360-finalRot)/step)%shuffled.length;
 
 document.querySelectorAll(".segment").forEach((el,i)=>{
 el.classList.toggle("highlight",i===index);
@@ -293,73 +277,42 @@ el.classList.toggle("highlight",i===index);
 
 setTimeout(()=>{
 
+let angle=(index*step+finalRot)*Math.PI/180;
+
+let x=260+Math.cos(angle)*180;
+let y=260+Math.sin(angle)*180;
+
+let hole=document.createElement("div");
+hole.className="bullet";
+hole.style.left=x+"px";
+hole.style.top=y+"px";
+board.appendChild(hole);
+
+let crack=document.createElement("div");
+crack.className="crack";
+crack.style.left=x-50+"px";
+crack.style.top=y-50+"px";
+board.appendChild(crack);
+
+document.getElementById("shot").play();
+
 let name=shuffled[index];
 
-if(Math.random()<0.05) name="Simon Moat";
+if(Math.random()<0.05){
 
-let dart=document.createElement("div");
-dart.className="dart";
+name="Simon Moat";
 
-let barrel=document.createElement("div");
-barrel.className="barrel";
-
-dart.appendChild(barrel);
-board.appendChild(dart);
-
-let startX=-50;
-let startY=Math.random()*520;
-
-let targetX=260+Math.cos(index*2*Math.PI/shuffled.length)*180;
-let targetY=260+Math.sin(index*2*Math.PI/shuffled.length)*180;
-
-let stepAnim=0;
-
-function animate(){
-
-stepAnim+=0.03;
-
-let x=startX+(targetX-startX)*stepAnim;
-let y=startY+(targetY-startY)*stepAnim;
-
-dart.style.left=x+"px";
-dart.style.top=y+"px";
-
-dart.style.transform=`rotate(${Math.atan2(targetY-startY,targetX-startX)*180/Math.PI}deg)`;
-
-let trail=document.createElement("div");
-trail.className="trail";
-trail.style.left=x+"px";
-trail.style.top=y+"px";
-board.appendChild(trail);
-setTimeout(()=>trail.remove(),300);
-
-if(stepAnim<1){
-
-requestAnimationFrame(animate);
-
-}else{
-
-document.getElementById("thud").play();
-
-if(name==="Simon Moat"){
-
-board.style.transition="transform 3s";
-confettiBurst();
+board.style.transition="transform 4s";
+confetti();
 
 }
 
-darts.push(name);
-throws++;
+results.push(name);
+shots++;
 
-if(throws===3) showResults();
+if(shots===3)showResults();
 
-}
-
-}
-
-animate();
-
-},2000);
+},3000);
 
 }
 
@@ -368,9 +321,9 @@ function showResults(){
 let r=document.getElementById("results");
 
 r.innerHTML=
-"💋 Snog: "+darts[0]+"<br>"+
-"💍 Marry: "+darts[1]+"<br>"+
-"🚫 Avoid: "+darts[2];
+"💋 Snog: "+results[0]+"<br>"+
+"💍 Marry: "+results[1]+"<br>"+
+"🚫 Avoid: "+results[2];
 
 setTimeout(()=>r.classList.add("show"),200);
 
@@ -378,19 +331,19 @@ setTimeout(()=>r.classList.add("show"),200);
 
 function resetGame(){
 
-document.querySelectorAll(".dart").forEach(e=>e.remove());
-document.querySelectorAll(".trail").forEach(e=>e.remove());
+document.querySelectorAll(".bullet").forEach(e=>e.remove());
+document.querySelectorAll(".crack").forEach(e=>e.remove());
 document.querySelectorAll(".segment").forEach(e=>e.classList.remove("highlight"));
 
-throws=0;
-darts=[];
+shots=0;
+results=[];
+
+rotation=0;
+
+board.style.transform="rotate(0deg)";
 
 document.getElementById("results").classList.remove("show");
 document.getElementById("results").innerHTML="";
-
-currentRotation=0;
-
-board.style.transform="rotate(0deg)";
 
 setupBoard();
 
